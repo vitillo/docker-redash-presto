@@ -1,0 +1,28 @@
+redash:
+  build: ..
+  ports:
+    - "5000:5000"
+  links:
+    - redis
+    - postgresql
+  environment:
+    DB_URI: postgresql
+    DB_USER: postgres
+    METASTORE_URI: metastore
+    REDASH_STATIC_ASSETS_PATH: "../rd_ui/dist/"
+    REDASH_LOG_LEVEL: "INFO"
+    REDASH_REDIS_URL: "redis://redis:6379/0"
+    REDASH_DATABASE_URL: "postgresql://postgres@postgresql/redash"
+    REDASH_COOKIE_SECRET: veryverysecret
+redis:
+  image: redis:2.8
+postgresql:
+  image: postgres:9.3
+  volumes:
+    - /opt/postgres-data:/var/lib/postgresql/data
+redash-nginx:
+  image: redash/nginx:latest
+  ports:
+    - "80:80"
+  links:
+    - redash
